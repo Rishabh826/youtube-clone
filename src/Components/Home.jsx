@@ -1,28 +1,26 @@
-// src/Components/SearchResult.js
+// src/Components/Home.js
 import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
 import { fetchDataFromApi } from "../Utils/api";
 import { Context } from "../Context/ContextApi";
 import LeftNav from "./LeftNav";
-import SearchResultVideoCard from "./SearchResultVideoCard";
+import VideoCard from "./VideoCard";
 
-const SearchResult = () => {
-  const [result, setResult] = useState([]);
-  const { searchQuery } = useParams();
+const Home = () => {
+  const [videos, setVideos] = useState([]);
   const { setLoading } = useContext(Context);
 
   useEffect(() => {
     document.getElementById("root").classList.remove("custom-h");
-    fetchSearchResults();
-  }, [searchQuery]);
+    fetchHomeVideos();
+  }, []);
 
-  const fetchSearchResults = async () => {
+  const fetchHomeVideos = async () => {
     setLoading(true);
     try {
-      const res = await fetchDataFromApi(`search/?q=${searchQuery}`);
-      setResult(res?.contents || []);
+      const res = await fetchDataFromApi(`search/?q=trending`);
+      setVideos(res?.contents || []);
     } catch (error) {
-      console.error("Error fetching search results: ", error);
+      console.error("Error fetching home videos: ", error);
     }
     setLoading(false);
   };
@@ -32,12 +30,10 @@ const SearchResult = () => {
       <LeftNav />
       <div className="grow w-[calc(100%-240px)] h-full overflow-y-auto bg-black">
         <div className="grid grid-cols-1 gap-2 p-5">
-          {result?.map((item) => {
+          {videos?.map((item) => {
             if (item?.type !== "video") return null;
             let video = item?.video;
-            return (
-              <SearchResultVideoCard key={video?.videoId} video={video} />
-            );
+            return <VideoCard key={video?.videoId} video={video} />;
           })}
         </div>
       </div>
@@ -45,4 +41,4 @@ const SearchResult = () => {
   );
 };
 
-export default SearchResult;
+export default Home;
